@@ -47,6 +47,7 @@
             {% if b.genre %}{{ b.genre }} · {% endif %}
             {% if b.pages %}{{ b.pages }} pages{% endif %}
           </div>
+          <div class="meta small">Rating: {{ b.avg_rating if b.avg_rating is not none else "N/A" }} ({{ b.ratings_count or 0 }})</div>
           <div class="owners">
             <strong>Owner: {{ owner.name }}</strong>
           </div>

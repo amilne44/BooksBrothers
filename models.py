@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, UniqueConstraint, Text
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, UniqueConstraint, Text, Float
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy import create_engine
 import os
@@ -28,6 +28,9 @@ class Book(Base):
     genre = Column(String, nullable=True)
     pages = Column(Integer, nullable=True)
     cover_url = Column(String, nullable=True)
+    description = Column(Text, nullable=True)
+    avg_rating = Column(Float, nullable=True)
+    ratings_count = Column(Integer, nullable=True)
     created_at = Column(DateTime)
     shelves = relationship("Bookshelf", back_populates="book", cascade="all, delete-orphan")
 

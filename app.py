@@ -45,7 +45,10 @@ def index():
             "genre": b.genre,
             "pages": b.pages,
             "cover_url": b.cover_url,
-            "owners": owners
+            "owners": owners,
+            "description": b.description,
+            "avg_rating": b.avg_rating,
+            "ratings_count": b.ratings_count
         })
         # Collect unique owners
         for owner in owners:
@@ -80,6 +83,9 @@ def my_books():
             "genre": b.genre,
             "pages": b.pages,
             "cover_url": b.cover_url,
+            "description": b.description,
+            "avg_rating": b.avg_rating,
+            "ratings_count": b.ratings_count,
             "added_at": s.added_at
         })
     return render_template("mybooks.html", books=books, user=user)
@@ -104,6 +110,16 @@ def api_add_book():
     except (ValueError, TypeError):
         pages = None
 
+    description = data.get("description") or data.get("desc")
+    try:
+        avg_rating = float(data.get("avg_rating")) if data.get("avg_rating") is not None else None
+    except (ValueError, TypeError):
+        avg_rating = None
+    try:
+        ratings_count = int(data.get("ratings_count")) if data.get("ratings_count") is not None else None
+    except (ValueError, TypeError):
+        ratings_count = None
+
     if not openlibrary_id or not title:
         return jsonify({"error": "openLibraryId and title required"}), 400
 
@@ -119,6 +135,9 @@ def api_add_book():
             genre=genre,
             pages=pages,
             cover_url=cover_url,
+            description=description,
+            avg_rating=avg_rating,
+            ratings_count=ratings_count,
             created_at=datetime.utcnow()
         )
         db.add(book)
@@ -127,6 +146,23 @@ def api_add_book():
         except IntegrityError:
             db.rollback()
             book = db.query(Book).filter(Book.openlibrary_id == openlibrary_id).first()
+    else:
+        # update existing book metadata if provided
+        updated = False
+        if description and book.description != description:
+            book.description = description; updated = True
+        if avg_rating is not None and book.avg_rating != avg_rating:
+            book.avg_rating = avg_rating; updated = True
+        if ratings_count is not None and book.ratings_count != ratings_count:
+            book.ratings_count = ratings_count; updated = True
+        if genre and book.genre != genre:
+            book.genre = genre; updated = True
+        if pages is not None and book.pages != pages:
+            book.pages = pages; updated = True
+        if cover_url and book.cover_url != cover_url:
+            book.cover_url = cover_url; updated = True
+        if updated:
+            db.add(book); db.commit()
 
     # Create bookshelf entry if missing
     existing = db.query(Bookshelf).filter(Bookshelf.user_id == user.id, Bookshelf.book_id == book.id).first()
@@ -192,7 +228,10 @@ def api_list_books():
             "genre": b.genre,
             "pages": b.pages,
             "cover_url": b.cover_url,
-            "owners": owners
+            "owners": owners,
+            "description": b.description,
+            "avg_rating": b.avg_rating,
+            "ratings_count": b.ratings_count
         })
     return jsonify(out)
 

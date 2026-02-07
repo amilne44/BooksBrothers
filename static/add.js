@@ -37,6 +37,10 @@ async function doSearch(q) {
       let pages = null;
       let genre = "";
       
+      let description = "";
+      let avg_rating = null;
+      let ratings_count = null;
+
       if (d.key) {
         try {
           const workRes = await fetch(`https://openlibrary.org${d.key}.json`);
@@ -55,6 +59,17 @@ async function doSearch(q) {
             if (workData.subjects && workData.subjects.length > 0) {
               genre = workData.subjects[0];
             }
+            // Get description
+            if (workData.description) {
+              description = typeof workData.description === 'string' ? workData.description : (workData.description.value || "");
+            } else if (workData.excerpts && workData.excerpts.length > 0) {
+              description = workData.excerpts[0].text || "";
+            }
+            // Get rating
+            if (workData.ratings) {
+              avg_rating = workData.ratings.average || null;
+              ratings_count = workData.ratings.count || null;
+            }
           }
         } catch (e) {
           console.log("Could not fetch work details:", e);
@@ -64,6 +79,7 @@ async function doSearch(q) {
       const tile = document.createElement("div");
       tile.className = "tile";
       tile.dataset.openlibraryId = olid;
+      tile.title = description;
       tile.innerHTML = `
         <div class="cover">
           ${coverUrl ? `<img src="${escapeHtml(coverUrl)}" alt="${escapeHtml(title)}">` : '<div class="no-cover">No cover</div>'}
@@ -79,7 +95,7 @@ async function doSearch(q) {
         addBtn.disabled = true;
         addBtn.textContent = 'Adding...';
         try {
-          const body = { openLibraryId: olid || title, title, author, genre, pages, coverUrl };
+          const body = { openLibraryId: olid || title, title, author, genre, pages, coverUrl, description, avg_rating, ratings_count };
           const r = await fetch('/api/books/add', { method: 'POST', headers: {'content-type':'application/json'}, body: JSON.stringify(body)});
           if (r.ok) {
             addBtn.textContent = 'Success';
