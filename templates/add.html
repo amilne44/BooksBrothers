@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Add a book</h2>
+  <p>Search Open Library for a title, author, or ISBN.</p>
+
+  <div class="page-controls">
+    <div class="search-wrap">
+      <input id="q" placeholder="Search by title, author, ISBN..." />
+    </div>
+    <button id="btnSearch" class="btn">Search</button>
+  </div>
+
+  <div id="grid" class="grid" style="margin-top:16px"></div>
+
+  <script src="{{ url_for('static', filename='add.js') }}"></script>
+{% endblock %}

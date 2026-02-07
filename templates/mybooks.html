@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>My books</h2>
+  
+  <div class="page-controls">
+    <div class="search-wrap">
+      <input id="searchInput" placeholder="Search by title, author, genre..." />
+    </div>
+  </div>
+
+  {% if books|length == 0 %}
+    <p>You don't have any books yet — go add some!</p>
+  {% endif %}
+
+  <div id="myGrid" class="grid">
+    {% for b in books %}
+      <div class="tile" data-book-id="{{ b.book_id }}" data-title="{{ b.title|lower }}" data-author="{{ (b.author or '')|lower }}" data-genre="{{ (b.genre or '')|lower }}">
+        <div class="cover">
+          {% if b.cover_url %}
+            <img src="{{ b.cover_url }}" alt="{{ b.title }}">
+          {% else %}
+            <div class="no-cover">No cover</div>
+          {% endif %}
+        </div>
+        <h3>{{ b.title }}</h3>
+        <div class="meta">{{ b.author or "" }}</div>
+        <div class="meta small">
+          {% if b.genre %}{{ b.genre }} · {% endif %}
+          {% if b.pages %}{{ b.pages }} pages{% endif %}
+        </div>
+        <div class="owners">
+          <div>Added: {{ b.added_at }}</div>
+        </div>
+        <div style="margin-top:8px">
+          <button class="btn btn-danger remove-btn">Remove</button>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <script src="{{ url_for('static', filename='my_books.js') }}"></script>
+{% endblock %}

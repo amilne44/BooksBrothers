@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="page-controls">
+    <div class="search-wrap">
+      <input id="searchInput" placeholder="Search by title, author, genre..." />
+    </div>
+
+    <div class="sort-wrap">
+      <label>Sort:</label>
+      <select id="sortSelect">
+        <option value="title">Title</option>
+        <option value="author">Author</option>
+        <option value="genre">Genre</option>
+      </select>
+      <button id="toggleOrder" class="btn btn-small">Asc</button>
+    </div>
+
+    <div class="filter-wrap">
+      <label>Owner:</label>
+      <select id="ownerFilter" multiple>
+        <option value="">All owners</option>
+        {% for o in unique_owners %}
+          <option value="{{ o.id }}">{{ o.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <h2>All books</h2>
+  {% if books|length == 0 %}
+    <p>No books yet — add some!</p>
+  {% endif %}
+  <div id="grid" class="grid">
+    {% for b in books %}
+      {% for owner in b.owners %}
+        <div class="tile" data-title="{{ b.title|lower }}" data-author="{{ (b.author or '')|lower }}" data-genre="{{ (b.genre or '')|lower }}" data-owner-id="{{ owner.id }}">
+          <div class="cover">
+            {% if b.cover_url %}
+              <img src="{{ b.cover_url }}" alt="{{ b.title }}">
+            {% else %}
+              <div class="no-cover">No cover</div>
+            {% endif %}
+          </div>
+          <h3>{{ b.title }}</h3>
+          <div class="meta">{{ b.author or "" }}</div>
+          <div class="meta small">
+            {% if b.genre %}{{ b.genre }} · {% endif %}
+            {% if b.pages %}{{ b.pages }} pages{% endif %}
+          </div>
+          <div class="owners">
+            <strong>Owner: {{ owner.name }}</strong>
+          </div>
+        </div>
+      {% endfor %}
+    {% endfor %}
+  </div>
+
+  <script src="{{ url_for('static', filename='index.js') }}"></script>
+{% endblock %}

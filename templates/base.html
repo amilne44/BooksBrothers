@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Books Brothers</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="brand">
+          <a href="{{ url_for('index') }}">
+            <span class="book-logo">📚</span>
+            <h1>Books Brothers</h1>
+          </a>
+        </div>
+
+        <nav class="top-actions">
+          <a class="btn" href="{{ url_for('index') }}">Brown Library</a>
+          <a class="btn" href="{{ url_for('add_page') }}">Add</a>
+          {% if user %}
+            <a class="btn" href="{{ url_for('my_books') }}">My books</a>
+            <a class="btn btn-logout" href="{{ url_for('logout') }}">Log out</a>
+          {% else %}
+            <a class="btn" href="{{ url_for('signup') }}">Sign up</a>
+            <a class="btn" href="{{ url_for('login') }}">Sign in</a>
+          {% endif %}
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="messages">
+            {% for m in messages %}
+              <li>{{ m }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>
